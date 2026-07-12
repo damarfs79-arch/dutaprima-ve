@@ -6,7 +6,7 @@ const steps = ref([])
 
 const requirements = [
   'Siswa/Siswi aktif kelas X & Xl SMK PGRI 5 JEMBER',
-  'Sopan dan santun,berpenampilan menarik',
+  'Sopan dan santun berpenampilan menarik',
   'Mampu berkomunikasi dengan baik dan percaya diri.',
   'Berkomitmen menjalankan tugas selama periode masa menjabat.',
   'Mampu menjalankan tugas selama periode masa menjabat',
@@ -34,7 +34,8 @@ onMounted(loadSettings)
 
 const form = ref({
   nama: '',
-  nama_kelas_jurusan: '',
+  kelas: '',
+  jurusan: '',
   ttl: '',
   bakat: '',
   prestasi: '',
@@ -48,7 +49,7 @@ const form = ref({
 const submitted = ref(false)
 
 // === Validasi Upload ===
-const maxSizeMB = 5
+const maxSizeMB = 50
 const maxSizeBytes = maxSizeMB * 1024 * 1024
 
 // Foto Full Body
@@ -123,7 +124,7 @@ async function submitForm() {
     alert('Harap centang konfirmasi kesediaan menjadi Duta Prima.')
     return
   }
-  if (!form.value.nama || !form.value.nama_kelas_jurusan || !form.value.ttl || !form.value.bakat || !form.value.whatsapp) {
+  if (!form.value.nama || !form.value.kelas || !form.value.jurusan || !form.value.ttl || !form.value.bakat || !form.value.whatsapp) {
     alert('Harap isi semua field yang diwajibkan (termasuk Nomor WhatsApp).')
     return
   }
@@ -135,7 +136,7 @@ async function submitForm() {
   try {
     const payload = {
       nama: form.value.nama,
-      nama_kelas_jurusan: form.value.nama_kelas_jurusan,
+      nama_kelas_jurusan: `${form.value.kelas} ${form.value.jurusan}`.trim(),
       ttl: form.value.ttl || '',
       bakat: form.value.bakat || '',
       prestasi: form.value.prestasi || '',
@@ -241,7 +242,7 @@ onMounted(() => {
             </p>
           </div>
           
-          <button @click="submitted = false; form = {nama: '', nama_kelas_jurusan: '', ttl: '', bakat: '', prestasi: '', motivasi: '', setuju: false}; fileFull = null; fileNameFull = ''; fileHalf = null; fileNameHalf = ''; filePrestasi = null; fileNamePrestasi = ''" class="mt-8 text-sm text-brand-orange font-semibold hover:underline">
+          <button @click="submitted = false; form = {nama: '', kelas: '', jurusan: '', ttl: '', bakat: '', prestasi: '', motivasi: '', setuju: false}; fileFull = null; fileNameFull = ''; fileHalf = null; fileNameHalf = ''; filePrestasi = null; fileNamePrestasi = ''" class="mt-8 text-sm text-brand-orange font-semibold hover:underline">
             ← Kembali ke halaman awal
           </button>
         </div>
@@ -260,14 +261,16 @@ onMounted(() => {
 
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-brand-dark mb-1.5">Kelas Dan Jurusan</label>
-              <input
-              v-model="form.nama_kelas_jurusan"
-              type="text"
-              required
-              placeholder="Masukkan kelas dan jurusan Anda"
-              class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange"
-            />
+              <label class="block text-sm font-medium text-brand-dark mb-1.5">Kelas & Jurusan</label>
+              <div class="grid grid-cols-2 gap-2">
+                <select v-model="form.kelas" required class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange bg-white">
+                  <option value="" disabled>Kelas</option>
+                  <option value="X">X</option>
+                  <option value="XI">XI</option>
+                  <option value="XII">XII</option>
+                </select>
+                <input v-model="form.jurusan" type="text" required placeholder="Cth: RPL 1" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange" />
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-brand-dark mb-1.5">TTL (Tempat, Tanggal Lahir)</label>
@@ -331,7 +334,7 @@ onMounted(() => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-brand-dark mb-1.5">Motivasi Bergabung</label>
+            <label class="block text-sm font-medium text-brand-dark mb-1.5">Visi Misi / Motivasi Bergabung <span class="text-gray-400 font-normal">(Opsional)</span></label>
             <textarea
               v-model="form.motivasi"
               rows="3"
@@ -359,11 +362,11 @@ onMounted(() => {
               @dragleave.prevent="draggingPrestasi = false"
               @drop.prevent="onDropPrestasi"
             >
-              <span class="text-2xl mb-1">🏆</span>
+              <span class="text-2xl mb-1"></span>
               <span class="font-medium text-sm text-brand-dark">
                 {{ fileNamePrestasi || 'Klik atau seret bukti prestasi ke sini' }}
               </span>
-              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Maksimal 5MB).</span>
+              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Tanpa Batas Ukuran).</span>
               <input type="file" accept="image/png, image/jpeg, application/pdf" class="hidden" @change="handleFilePrestasi" />
             </label>
             <p v-if="errorPrestasi" class="text-xs text-red-500 mt-1">{{ errorPrestasi }}</p>
@@ -379,11 +382,11 @@ onMounted(() => {
               @dragleave.prevent="draggingFull = false"
               @drop.prevent="onDropFull"
             >
-              <span class="text-3xl mb-2">📤</span>
+              <span class="text-3xl mb-2"></span>
               <span class="font-medium text-sm text-brand-dark">
                 {{ fileNameFull || 'Klik atau seret foto full body ke sini' }}
               </span>
-              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Maksimal 5MB).</span>
+              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Tanpa Batas Ukuran).</span>
               <input type="file" accept="image/png, image/jpeg, application/pdf" class="hidden" @change="handleFileFull" />
             </label>
             <p v-if="errorFull" class="text-xs text-red-500 mt-1">{{ errorFull }}</p>
@@ -399,11 +402,11 @@ onMounted(() => {
               @dragleave.prevent="draggingHalf = false"
               @drop.prevent="onDropHalf"
             >
-              <span class="text-3xl mb-2">📤</span>
+              <span class="text-3xl mb-2"></span>
               <span class="font-medium text-sm text-brand-dark">
                 {{ fileNameHalf || 'Klik atau seret foto setengah body ke sini' }}
               </span>
-              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Maksimal 5MB).</span>
+              <span class="text-xs text-gray-500 mt-1">Format JPG, PNG, atau PDF (Tanpa Batas Ukuran).</span>
               <input type="file" accept="image/png, image/jpeg, application/pdf" class="hidden" @change="handleFileHalf" />
             </label>
             <p v-if="errorHalf" class="text-xs text-red-500 mt-1">{{ errorHalf }}</p>
@@ -424,7 +427,7 @@ onMounted(() => {
         </form>
 
         <p class="text-center text-sm text-gray-500 mt-5">
-          Butuh bantuan? <a href="#" class="text-brand-orange font-semibold">Hubungi Panitia</a>
+          Butuh bantuan? <a href="https://wa.me/6281232282940" target="_blank" rel="noopener noreferrer" class="text-brand-orange font-semibold">Hubungi Panitia</a>
         </p>
       </div>
     </div>

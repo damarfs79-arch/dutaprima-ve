@@ -59,6 +59,9 @@ export const settingsApi = {
     _cache.delete('angkatan') // invalidate cache saat update
     return request('/settings/angkatan', { method: 'PUT', body: data })
   },
+
+  getVoting: () => request('/settings/voting'),
+  updateVoting: (data) => request('/settings/voting', { method: 'PUT', body: data }),
 }
 
 // ==================== GALLERY ====================

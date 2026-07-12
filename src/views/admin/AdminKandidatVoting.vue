@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { kandidatVotingApi } from '../../services/dutaPrimaApi'
+import { ref, onMounted, computed } from 'vue'
+import { kandidatVotingApi, settingsApi } from '../../services/dutaPrimaApi'
+import VueApexCharts from 'vue3-apexcharts'
 
 const daftar = ref([])
 const loading = ref(false)
@@ -21,13 +22,108 @@ const deleteTargetId = ref(null)
 // Modal konfirmasi reset
 const showResetConfirm = ref(false)
 
+// Pengaturan Waktu Voting
+const showSettingModal = ref(false)
+const savingSetting = ref(false)
+const votingSettingForm = ref({ end_time: '' })
+
+// Data untuk Grafik
+const chartOptions = computed(() => {
+  // Sort the data locally for the chart to show highest votes first
+  const sorted = [...daftar.value].sort((a, b) => b.suara - a.suara)
+  return {
+    chart: {
+      type: 'bar',
+      fontFamily: 'inherit',
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        dynamicAnimation: { enabled: true, speed: 350 }
+      }
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 8,
+        horizontal: true,
+        barHeight: '65%',
+        distributed: true,
+        dataLabels: { position: 'bottom' }
+      }
+    },
+    colors: [
+      '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#f97316'
+    ],
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'dark',
+        type: "horizontal",
+        shadeIntensity: 0.5,
+        inverseColors: false,
+        opacityFrom: 1,
+        opacityTo: 0.8,
+        stops: [0, 100]
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      textAnchor: 'start',
+      style: {
+        fontSize: '13px',
+        fontFamily: 'inherit',
+        fontWeight: 'bold',
+        colors: ['#fff']
+      },
+      formatter: function (val, opt) {
+        return opt.w.globals.labels[opt.dataPointIndex] + " — " + val + " Suara"
+      },
+      offsetX: 15,
+      dropShadow: { enabled: true, top: 1, left: 1, blur: 1, opacity: 0.45 }
+    },
+    xaxis: {
+      categories: sorted.map(k => k.nama),
+      labels: { show: false },
+      axisBorder: { show: false },
+      axisTicks: { show: false }
+    },
+    yaxis: {
+      labels: { show: false }
+    },
+    grid: { show: false, padding: { left: -10, right: 0, top: -10, bottom: -10 } },
+    legend: { show: false },
+    tooltip: {
+      theme: 'light',
+      style: { fontSize: '13px' },
+      y: { formatter: (val) => val + ' Suara' }
+    }
+  }
+})
+
+const chartSeries = computed(() => {
+  const sorted = [...daftar.value].sort((a, b) => b.suara - a.suara)
+  return [{
+    name: 'Total Suara',
+    data: sorted.map(k => k.suara)
+  }]
+})
+
 async function fetchData() {
   loading.value = true
   errorMsg.value = ''
   try {
-    daftar.value = await kandidatVotingApi.getAll()
+    const [daftarRes, settingRes] = await Promise.all([
+      kandidatVotingApi.getAll(),
+      settingsApi.getVoting()
+    ])
+    daftar.value = daftarRes
+    if (settingRes && settingRes.end_time) {
+      // Input datetime-local expects format YYYY-MM-DDThh:mm
+      votingSettingForm.value.end_time = settingRes.end_time.substring(0, 16)
+    }
   } catch (err) {
-    errorMsg.value = 'Gagal memuat data kandidat.'
+    errorMsg.value = 'Gagal memuat data.'
   } finally {
     loading.value = false
   }
@@ -61,6 +157,7 @@ function handleFotoChange(e) {
 async function submitForm() {
   saving.value = true
   errorMsg.value = ''
+  form.value.suara = parseInt(form.value.suara) || 0
   try {
     if (isEdit.value) {
       const updated = await kandidatVotingApi.update(form.value.id, form.value)
@@ -98,13 +195,40 @@ async function doDelete() {
 async function doReset() {
   try {
     await kandidatVotingApi.resetVotes()
+    // Otomatis hapus batas waktu voting agar kembali terbuka
+    await settingsApi.updateVoting({ end_time: null })
+    votingSettingForm.value.end_time = ''
+
     daftar.value = daftar.value.map((k) => ({ ...k, suara: 0 }))
-    successMsg.value = 'Semua suara berhasil direset ke 0.'
-    setTimeout(() => (successMsg.value = ''), 3000)
+    successMsg.value = 'Semua suara berhasil direset dan sesi voting dibuka kembali.'
+    setTimeout(() => (successMsg.value = ''), 4000)
   } catch (err) {
     errorMsg.value = 'Gagal mereset suara.'
   } finally {
     showResetConfirm.value = false
+  }
+}
+
+async function saveVotingSetting() {
+  savingSetting.value = true
+  errorMsg.value = ''
+  try {
+    // If end_time is empty, we send null to clear it
+    let isoTime = null
+    if (votingSettingForm.value.end_time) {
+      // Create date object and convert to ISO string so the backend handles it properly
+      const dt = new Date(votingSettingForm.value.end_time)
+      isoTime = dt.toISOString()
+    }
+    
+    await settingsApi.updateVoting({ end_time: isoTime })
+    successMsg.value = 'Pengaturan waktu voting berhasil disimpan.'
+    setTimeout(() => (successMsg.value = ''), 3000)
+    showSettingModal.value = false
+  } catch (err) {
+    errorMsg.value = 'Gagal menyimpan pengaturan waktu.'
+  } finally {
+    savingSetting.value = false
   }
 }
 
@@ -116,6 +240,12 @@ onMounted(fetchData)
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Kandidat Voting</h1>
       <div class="flex gap-2">
+        <button
+          @click="showSettingModal = true"
+          class="border border-brand-amber/50 text-brand-orange hover:bg-brand-amber/10 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center gap-1.5"
+        >
+          ⏱️ Setting Waktu
+        </button>
         <button
           @click="showResetConfirm = true"
           class="border border-red-200 text-red-500 hover:bg-red-50 text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
@@ -133,6 +263,15 @@ onMounted(fetchData)
 
     <div v-if="errorMsg" class="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">{{ errorMsg }}</div>
     <div v-if="successMsg" class="bg-brand-amber/15 text-brand-orange text-sm px-4 py-3 rounded-lg mb-4">{{ successMsg }}</div>
+
+    <!-- Grafik Suara -->
+    <div v-if="daftar.length > 0 && !loading" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-2">Statistik Suara Sementara</h2>
+      <p class="text-sm text-gray-500 mb-4">Perolehan suara kandidat secara real-time berdasarkan ranking.</p>
+      <div class="min-h-[250px]">
+        <VueApexCharts type="bar" height="300" :options="chartOptions" :series="chartSeries" />
+      </div>
+    </div>
 
     <!-- Grid Kandidat -->
     <p v-if="loading" class="text-center text-sm text-gray-400 py-10">Memuat data...</p>
@@ -277,6 +416,34 @@ onMounted(fetchData)
           <button @click="showResetConfirm = false" class="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-lg text-sm hover:bg-gray-50">Batal</button>
           <button @click="doReset" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg text-sm">Ya, Reset</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal Setting Waktu Voting -->
+    <div v-if="showSettingModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4" @click.self="showSettingModal = false">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-xl">
+        <h2 class="text-lg font-bold text-gray-800 mb-2">Setting Waktu Voting</h2>
+        <p class="text-sm text-gray-500 mb-5">Atur kapan batas akhir voting. Jika kosong, voting akan terus berjalan.</p>
+        
+        <form @submit.prevent="saveVotingSetting" class="space-y-5">
+          <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-2">Batas Akhir Voting (Selesai)</label>
+            <input 
+              v-model="votingSettingForm.end_time" 
+              type="datetime-local" 
+              class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber transition-shadow"
+            />
+          </div>
+          
+          <div class="flex gap-3 pt-2">
+            <button type="button" @click="showSettingModal = false" class="flex-1 border border-gray-200 text-gray-600 font-semibold py-2.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
+              Batal
+            </button>
+            <button type="submit" :disabled="savingSetting" class="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white font-semibold py-2.5 rounded-xl text-sm disabled:opacity-60 transition-colors">
+              {{ savingSetting ? 'Menyimpan...' : 'Simpan Pengaturan' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

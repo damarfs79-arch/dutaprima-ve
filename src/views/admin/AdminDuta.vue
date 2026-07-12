@@ -24,7 +24,7 @@ const newAngkatan = ref('')
 
 const emptyForm = () => ({
   name: '', name_female: '',
-  kelas: '', title: '',
+  tingkat_kelas: '', jurusan_kelas: '', title: '',
   angkatan: '',
   photo: null, photo_couple: null, photo_female: null,
   visi: '', misi: '',
@@ -102,8 +102,8 @@ const removeAngkatan = (num) => {
 const handleFile = (e, key) => {
   const file = e.target.files[0]
   if (!file) return
-  if (file.size > 4 * 1024 * 1024) {
-    showToast('Ukuran foto melebihi 4MB!', 'error')
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('Ukuran foto melebihi 50MB!', 'error')
     e.target.value = ''
     return
   }
@@ -126,7 +126,8 @@ const openEdit = (duta) => {
   form.value = {
     name: duta.name || '',
     name_female: duta.name_female || '',
-    kelas: duta.kelas || '',
+    tingkat_kelas: duta.kelas ? duta.kelas.split(' ')[0] : '',
+    jurusan_kelas: duta.kelas ? duta.kelas.split(' ').slice(1).join(' ') : '',
     title: duta.title || '',
     angkatan: duta.angkatan || '',
     photo: null, photo_couple: null, photo_female: null,
@@ -153,7 +154,7 @@ const saveDuta = async () => {
     const payload = {
       name: form.value.name,
       name_female: form.value.name_female || '',
-      kelas: form.value.kelas,
+      kelas: `${form.value.tingkat_kelas} ${form.value.jurusan_kelas}`.trim(),
       title: form.value.title,
       angkatan: form.value.angkatan || '',
       visi: form.value.visi || '',
@@ -392,7 +393,7 @@ const confirmDelete = async () => {
                 <span v-else class="text-2xl">👫</span>
               </div>
               <div class="flex-1">
-                <label class="block text-xs font-semibold text-amber-700 mb-1">Upload Foto Berpasangan (maks 4MB)</label>
+                <label class="block text-xs font-semibold text-amber-700 mb-1">Upload Foto Berpasangan (Tanpa Batas Ukuran)</label>
                 <input @change="e => handleFile(e, 'photo_couple')" type="file" accept="image/*"
                   class="w-full text-xs border border-amber-200 rounded-lg bg-white file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 cursor-pointer"/>
                 <p v-if="isEditMode && preview.couple" class="text-[10px] text-amber-600 mt-1">Kosongkan jika tidak ingin mengganti foto.</p>
@@ -420,17 +421,17 @@ const confirmDelete = async () => {
                   class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-white"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-blue-700 mb-1">Foto Sendiri (maks 4MB)</label>
+                <label class="block text-xs font-semibold text-blue-700 mb-1">Foto Sendiri (Tanpa Batas Ukuran)</label>
                 <input @change="e => handleFile(e, 'photo')" type="file" accept="image/*"
                   class="w-full text-xs border border-blue-200 rounded-lg bg-white file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-blue-700 mb-1">Visi Putra</label>
+                <label class="block text-xs font-semibold text-blue-700 mb-1">Visi Putra <span class="text-blue-400 font-normal">(Opsional)</span></label>
                 <textarea v-model="form.visi" rows="2" placeholder="Visi Putra"
                   class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none bg-white"></textarea>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-blue-700 mb-1">Misi Putra</label>
+                <label class="block text-xs font-semibold text-blue-700 mb-1">Misi Putra <span class="text-blue-400 font-normal">(Opsional)</span></label>
                 <textarea v-model="form.misi" rows="2" placeholder="Misi Putra"
                   class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none bg-white"></textarea>
               </div>
@@ -454,17 +455,17 @@ const confirmDelete = async () => {
                   class="w-full px-3 py-2 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400/50 bg-white"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-pink-700 mb-1">Foto Sendiri (maks 4MB)</label>
+                <label class="block text-xs font-semibold text-pink-700 mb-1">Foto Sendiri (Tanpa Batas Ukuran)</label>
                 <input @change="e => handleFile(e, 'photo_female')" type="file" accept="image/*"
                   class="w-full text-xs border border-pink-200 rounded-lg bg-white file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-pink-100 file:text-pink-700 hover:file:bg-pink-200 cursor-pointer"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-pink-700 mb-1">Visi Putri</label>
+                <label class="block text-xs font-semibold text-pink-700 mb-1">Visi Putri <span class="text-pink-400 font-normal">(Opsional)</span></label>
                 <textarea v-model="form.visi_female" rows="2" placeholder="Visi Putri"
                   class="w-full px-3 py-2 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400/50 resize-none bg-white"></textarea>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-pink-700 mb-1">Misi Putri</label>
+                <label class="block text-xs font-semibold text-pink-700 mb-1">Misi Putri <span class="text-pink-400 font-normal">(Opsional)</span></label>
                 <textarea v-model="form.misi_female" rows="2" placeholder="Misi Putri"
                   class="w-full px-3 py-2 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400/50 resize-none bg-white"></textarea>
               </div>
@@ -475,9 +476,16 @@ const confirmDelete = async () => {
           <hr class="border-gray-100"/>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Kelas *</label>
-              <input v-model="form.kelas" type="text" placeholder="Misal: Kelas X MIPA 1"
-                class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber/50 bg-white"/>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Kelas & Jurusan *</label>
+              <div class="grid grid-cols-2 gap-2">
+                <select v-model="form.tingkat_kelas" required class="w-full px-2 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber/50 bg-white">
+                  <option value="" disabled>Kelas</option>
+                  <option value="X">X</option>
+                  <option value="XI">XI</option>
+                  <option value="XII">XII</option>
+                </select>
+                <input v-model="form.jurusan_kelas" type="text" required placeholder="Cth: RPL 1" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber/50 bg-white"/>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Angkatan</label>

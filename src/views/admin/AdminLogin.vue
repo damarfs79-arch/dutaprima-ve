@@ -58,7 +58,7 @@ const handleLogin = async () => {
             <input 
               v-model="password"
               :type="showPassword ? 'text' : 'password'"
-              placeholder="Masukkan passwod" 
+              placeholder="Masukkan password" 
               class="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-amber/50 focus:border-brand-amber transition-all bg-gray-50 focus:bg-white"
               required
             >

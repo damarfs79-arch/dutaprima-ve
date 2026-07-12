@@ -13,10 +13,7 @@ const daftarAktif = computed(() =>
   daftar.value.filter((p) => p.status === activeTab.value)
 )
 
-const informasiLanjutan = [
-  'Verifikasi berkas fisik di ruang Kesiswaan.',
-  'Pembekalan finalis minggu depan.',
-]
+
 
 async function fetchData() {
   loading.value = true
@@ -153,72 +150,6 @@ onMounted(() => {
             </table>
           </div>
         </div>
-
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="flex flex-col gap-6">
-            <div class="bg-brand-lilac/10 rounded-2xl p-6 sm:p-8">
-              <p class="text-xs font-semibold tracking-wide text-brand-orange mb-3">✨ SELAMAT BERGABUNG!</p>
-              <p class="text-sm text-gray-600 italic leading-relaxed">
-                "Selamat kepada seluruh peserta yang lolos! Teruslah berkarya, persiapkan dirimu sebaik mungkin untuk tahapan selanjutnya, dan jadilah inspirasi!"
-              </p>
-            </div>
-            <div class="bg-gray-50/80 rounded-2xl p-6 sm:p-8">
-              <p class="text-xs font-semibold tracking-wide text-gray-500 mb-3">💪 TETAP SEMANGAT!</p>
-              <p class="text-sm text-gray-600 italic leading-relaxed">
-                "Bagi yang belum lolos pada seleksi kali ini, jangan patah semangat. Terima kasih atas partisipasi dan usahamu. Jadikan pengalaman ini sebagai langkah awal untuk terus berkembang!"
-              </p>
-            </div>
-          </div>
-
-          <div class="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 shadow-sm">
-            <h3 class="font-display font-bold text-brand-dark mb-4">Informasi Lanjutan</h3>
-            <ul class="space-y-3 mb-6">
-              <li v-for="(info, i) in informasiLanjutan" :key="i" class="flex gap-3 text-sm text-gray-600">
-                <span class="w-6 h-6 rounded-full bg-brand-amber/20 text-brand-brown font-semibold text-xs flex items-center justify-center shrink-0">
-                  {{ i + 1 }}
-                </span>
-                {{ info }}
-              </li>
-            </ul>
-            <button class="w-full bg-brand-brown text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-brand-brown/90 transition-colors">
-              Download Panduan Lengkap
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Jargon Duta Prima -->
-    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-      <div class="relative bg-gradient-to-br from-[#e5b362] to-[#c78b3a] rounded-3xl p-8 sm:p-10 shadow-xl text-center overflow-hidden group transition-transform duration-500 hover:-translate-y-1">
-        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-black opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-        <p class="relative z-10 font-medium text-lg sm:text-xl lg:text-2xl leading-loose text-white drop-shadow-md italic">
-          <span class="block mb-2">"Duta Prima, Dutanya SMK PGRI 5 Jember</span>
-          <span class="block mb-2">Duta Prima, berprestasi, berkontribusi, menginspirasi</span>
-          <span class="block font-bold text-[#fff7e6] text-xl sm:text-2xl lg:text-3xl mt-4">Duta Prima, Yak Kadek!"</span>
-        </p>
-      </div>
-    </section>
-
-    <!-- CTA penutup -->
-    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 text-center">
-      <h2 class="font-display font-bold text-xl sm:text-2xl text-brand-dark mb-6">
-        Ingin tahu lebih banyak tentang Duta Prima?
-      </h2>
-      <div class="flex flex-wrap justify-center gap-4">
-        <a
-          href="#"
-          class="border border-brand-brown text-brand-brown font-semibold px-6 py-3 rounded-full text-sm hover:bg-brand-brown/5 transition-colors"
-        >
-          Hubungi Panitia
-        </a>
-        <RouterLink
-          to="/galeri-duta"
-          class="bg-brand-lilac/30 text-brand-brown font-semibold px-6 py-3 rounded-full text-sm hover:bg-brand-lilac/50 transition-colors"
-        >
-          Lihat Galeri Duta
-        </RouterLink>
       </div>
     </section>
   </div>

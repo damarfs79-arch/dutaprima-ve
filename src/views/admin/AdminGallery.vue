@@ -44,8 +44,8 @@ const confirmDelete = async () => {
 
 const handleFileChange = (e) => {
   const file = e.target.files[0]
-  if (file && file.size > 3 * 1024 * 1024) {
-    showToast('Ukuran foto melebihi 3MB!', 'error')
+  if (file && file.size > 50 * 1024 * 1024) {
+    showToast('Ukuran foto melebihi 50MB!', 'error')
     e.target.value = ''
     newPhoto.value.image = null
     return
@@ -213,7 +213,7 @@ onMounted(loadGalleries)
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto Galeri (Maks 3MB)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Upload Foto Galeri (Tanpa Batas Ukuran)</label>
             <p v-if="editId" class="text-xs text-gray-500 mb-2">Biarkan kosong jika tidak ingin mengubah foto.</p>
             <input @change="handleFileChange" type="file" accept="image/*" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber/50 focus:border-brand-amber transition-all bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-amber/15 file:text-brand-orange hover:file:bg-brand-amber/25">
           </div>

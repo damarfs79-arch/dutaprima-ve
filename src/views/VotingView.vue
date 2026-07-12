@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { kandidatVotingApi, settingsApi } from '../services/dutaPrimaApi'
 
 const marqueeText1 = ref('Pantau Terus Pengumuman Ini Untuk Update Terbaru Duta Prima 2026')
@@ -8,6 +8,12 @@ const marqueeText2 = ref('Pemilihan Duta Favorit Akan Ditutup Pada 30 November 2
 const kandidat = ref([])
 const loading = ref(false)
 const errorMsg = ref('')
+
+// Pengaturan Waktu Voting
+const votingEndTime = ref(null)
+const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+const isVotingEnded = ref(false)
+let timerInterval = null
 
 // Simpan kandidat id yang sudah dipilih
 const sudahVote = ref(
@@ -20,15 +26,60 @@ function hasVotedFor(id) {
   return sudahVote.value.includes(String(id))
 }
 
+function updateCountdown() {
+  if (!votingEndTime.value) return
+
+  const now = new Date().getTime()
+  const distance = votingEndTime.value - now
+
+  if (distance <= 0) {
+    isVotingEnded.value = true
+    clearInterval(timerInterval)
+    countdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0 }
+    return
+  }
+
+  isVotingEnded.value = false
+  countdown.value.days = Math.floor(distance / (1000 * 60 * 60 * 24))
+  countdown.value.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  countdown.value.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+  countdown.value.seconds = Math.floor((distance % (1000 * 60)) / 1000)
+}
+
 async function fetchKandidat() {
   loading.value = true
   errorMsg.value = ''
   try {
     kandidat.value = await kandidatVotingApi.getAll()
+
+    // Auto-reset localStorage if voted candidates were deleted or votes were reset to 0
+    if (sudahVote.value.length > 0) {
+      const validVotes = sudahVote.value.filter(id => {
+        const k = kandidat.value.find(c => String(c.id) === String(id))
+        return k && k.suara > 0
+      })
+      if (validVotes.length === 0) {
+        sudahVote.value = []
+        localStorage.removeItem('duta_prima_voted_ids')
+      }
+    }
   } catch (err) {
     errorMsg.value = 'Gagal memuat data kandidat.'
   } finally {
     loading.value = false
+  }
+}
+
+async function fetchVotingSettings() {
+  try {
+    const data = await settingsApi.getVoting()
+    if (data && data.end_time) {
+      votingEndTime.value = new Date(data.end_time).getTime()
+      updateCountdown()
+      timerInterval = setInterval(updateCountdown, 1000)
+    }
+  } catch (err) {
+    console.error('Gagal memuat pengaturan waktu voting', err)
   }
 }
 
@@ -38,7 +89,7 @@ const kandidatUrut = computed(() =>
 )
 
 async function vote(item) {
-  if (hasVotedAny.value) return
+  if (hasVotedAny.value || isVotingEnded.value) return
   try {
     const updated = await kandidatVotingApi.vote(item.id)
     const idx = kandidat.value.findIndex((k) => k.id === item.id)
@@ -53,12 +104,17 @@ async function vote(item) {
 
 onMounted(() => {
   fetchKandidat()
+  fetchVotingSettings()
   settingsApi.getMarquee().then(data => {
     if (data) {
       marqueeText1.value = data.voting_text1 || marqueeText1.value
       marqueeText2.value = data.voting_text2 || marqueeText2.value
     }
   }).catch(() => {})
+})
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
 })
 </script>
 
@@ -88,6 +144,37 @@ onMounted(() => {
       <p class="text-gray-600 mt-5 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
         Suara Anda menentukan siapa yang akan menjadi representasi keunggulan dan inspirasi bagi generasi mendatang. Berikan dukungan Anda kepada kandidat terbaik sekarang.
       </p>
+
+      <!-- Countdown Timer -->
+      <div v-if="votingEndTime" class="mt-10">
+        <div v-if="isVotingEnded" class="inline-block bg-red-100 text-red-600 px-6 py-3 rounded-2xl font-bold text-lg shadow-sm border border-red-200">
+          Voting Telah Ditutup
+        </div>
+        <div v-else class="inline-flex flex-col items-center">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Voting Berakhir Dalam</p>
+          <div class="flex items-center gap-3 sm:gap-4">
+            <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-3 sm:p-4 w-16 sm:w-20 text-center">
+              <span class="block text-2xl sm:text-3xl font-display font-bold text-brand-dark">{{ String(countdown.days).padStart(2, '0') }}</span>
+              <span class="block text-[10px] sm:text-xs text-gray-400 font-semibold mt-1 uppercase">Hari</span>
+            </div>
+            <span class="text-2xl font-bold text-gray-300">:</span>
+            <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-3 sm:p-4 w-16 sm:w-20 text-center">
+              <span class="block text-2xl sm:text-3xl font-display font-bold text-brand-dark">{{ String(countdown.hours).padStart(2, '0') }}</span>
+              <span class="block text-[10px] sm:text-xs text-gray-400 font-semibold mt-1 uppercase">Jam</span>
+            </div>
+            <span class="text-2xl font-bold text-gray-300">:</span>
+            <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-3 sm:p-4 w-16 sm:w-20 text-center">
+              <span class="block text-2xl sm:text-3xl font-display font-bold text-brand-dark">{{ String(countdown.minutes).padStart(2, '0') }}</span>
+              <span class="block text-[10px] sm:text-xs text-gray-400 font-semibold mt-1 uppercase">Menit</span>
+            </div>
+            <span class="text-2xl font-bold text-gray-300">:</span>
+            <div class="bg-white border border-gray-100 shadow-sm rounded-xl p-3 sm:p-4 w-16 sm:w-20 text-center">
+              <span class="block text-2xl sm:text-3xl font-display font-bold text-brand-orange">{{ String(countdown.seconds).padStart(2, '0') }}</span>
+              <span class="block text-[10px] sm:text-xs text-brand-orange font-semibold mt-1 uppercase">Detik</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Grid Kandidat -->
@@ -132,11 +219,11 @@ onMounted(() => {
 
             <button
               @click="vote(item)"
-              :disabled="hasVotedAny"
+              :disabled="hasVotedAny || isVotingEnded"
               class="w-full mt-5 flex items-center justify-center gap-2 bg-brand-brown hover:bg-brand-brown/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-full text-sm transition-colors"
             >
               <span>☑</span>
-              {{ hasVotedFor(item.id) ? 'Terima Kasih!' : 'Vote Sekarang' }}
+              {{ hasVotedFor(item.id) ? 'Terima Kasih!' : (isVotingEnded ? 'Voting Ditutup' : 'Vote Sekarang') }}
             </button>
           </div>
         </div>
@@ -154,7 +241,9 @@ onMounted(() => {
         </p>
         <div class="flex flex-wrap justify-center gap-4">
           <a
-            href="#"
+            href="https://wa.me/6281232282940"
+            target="_blank"
+            rel="noopener noreferrer"
             class="bg-brand-brown text-white font-semibold px-6 py-3 rounded-full text-sm hover:bg-brand-brown/90 transition-colors"
           >
             Hubungi Panitia

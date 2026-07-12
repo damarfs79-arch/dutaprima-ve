@@ -3,7 +3,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const slides = [
   '/images/hero-1.jpg',
-  '/images/hero-2.jpg'
+  '/images/hero-2.jpg',
+  '/images/hero-3.jpg'
 ]
 const activeSlide = ref(0)
 let slideInterval
@@ -28,16 +29,16 @@ const pilars = [
 
 const missions = [
   {
-    title: 'Inovasi Berkelanjutan',
-    desc: 'Menciptakan program kesiswaan yang adaptif terhadap perkembangan zaman dan teknologi.',
+    title: 'Pengembangan Karakter & Potensi',
+    desc: 'Mengembangkan karakter, potensi, bakat, dan kemampuan diri untuk meraih prestasi di bidang akademik maupun nonakademik.',
   },
   {
-    title: 'Pengabdian Masyarakat',
-    desc: 'Menginisiasi aksi nyata yang memberikan manfaat langsung bagi lingkungan sekitar sekolah.',
+    title: 'Kontribusi & Keteladanan',
+    desc: 'Berperan aktif dan berkontribusi dalam setiap kegiatan sekolah, menjadi teladan dalam sikap, serta memberikan manfaat bagi lingkungan sekolah dan masyarakat.',
   },
   {
-    title: 'Pengembangan Potensi',
-    desc: 'Menyediakan platform bagi siswa untuk mengeksplorasi bakat di bidang non-akademik.',
+    title: 'Inspirasi Generasi Muda',
+    desc: 'Menjadi pribadi yang percaya diri, beretika, dan komunikatif sehingga mampu menginspirasi generasi muda melalui karya, tindakan, dan keteladanan.',
   },
 ]
 </script>
@@ -121,8 +122,8 @@ const missions = [
           <p class="text-sm text-gray-600 leading-relaxed mb-6">
             Kami percaya bahwa kecerdasan intelektual harus dibarengi dengan kemampuan komunikasi, manajemen waktu, dan penyelesaian masalah yang mumpuni. Duta Prima dibekali dengan pelatihan intensif untuk menjadi role model di sekolah.
           </p>
-          <div class="rounded-xl bg-gray-100 h-40 sm:h-48 flex items-center justify-center text-gray-400 text-sm">
-            Ilustrasi program akademik
+          <div class="rounded-xl bg-gray-100 w-full overflow-hidden">
+            <img src="/images/academic.png" alt="Ilustrasi Akademik dan Soft Skills" class="w-full h-auto" />
           </div>
         </div>
 
@@ -134,9 +135,9 @@ const missions = [
           <p class="text-sm text-white/80 leading-relaxed flex-1">
             Kepedulian terhadap sesama adalah inti dari pengabdian kami. Melalui program bakti sosial dan aksi kemanusiaan, kami membangun empati.
           </p>
-          <a href="#" class="inline-flex items-center gap-1 text-brand-amber font-semibold text-sm mt-6">
-            Lihat Program <span>→</span>
-          </a>
+          <RouterLink to="/galeri-duta" class="inline-flex items-center gap-1 text-brand-amber font-semibold text-sm mt-6 hover:text-white transition-colors">
+            Lihat Program <span aria-hidden="true">&rarr;</span>
+          </RouterLink>
         </div>
       </div>
     </section>
@@ -150,7 +151,7 @@ const missions = [
           </span>
           <p class="text-xs font-semibold tracking-wide text-brand-orange mb-3">VISI UTAMA</p>
           <p class="relative font-display font-bold text-xl sm:text-2xl text-brand-dark leading-snug">
-            "Menjadi pionir penggerak prestasi dan karakter SMK PGRI 05 Jember yang berintegritas, kreatif, dan berdampak bagi masyarakat."
+            "Menjadi representasi siswa SMK PGRI 5 Jember yang berkarakter, berprestasi, berkontribusi, dan menginspirasi."
           </p>
           <div class="w-12 h-1 bg-brand-amber mt-6 rounded-full"></div>
         </div>
@@ -204,9 +205,7 @@ const missions = [
             Pendaftaran Duta Prima Angkatan 2026/2027 telah dibuka. Jadilah wajah prestasi sekolah dan raih pengalaman kepemimpinan yang tak terlupakan.
           </p>
           <div class="flex flex-wrap gap-4 mt-7">
-            <button class="bg-brand-amber text-brand-dark font-semibold px-6 py-3 rounded-full text-sm hover:bg-brand-amber/90 transition-colors">
-              Unduh Panduan
-            </button>
+
             <RouterLink
               to="/pendaftaran"
               class="bg-white text-brand-brown font-semibold px-6 py-3 rounded-full text-sm hover:bg-gray-100 transition-colors"
@@ -216,16 +215,10 @@ const missions = [
           </div>
         </div>
         <div class="relative flex justify-center">
-          <div class="w-44 h-44 sm:w-56 sm:h-56 rounded-full bg-white/10 flex items-center justify-center">
-            <span class="text-white/70 text-sm">Ilustrasi siswa</span>
+          <div class="w-44 h-44 sm:w-56 sm:h-56 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-4 border-white/20">
+            <img src="/images/logo-smk.png" alt="Logo SMK" class="w-full h-full object-cover object-top" />
           </div>
-          <div class="absolute bottom-2 left-2 sm:left-6 bg-white rounded-xl px-4 py-2 shadow-lg flex items-center gap-2">
-            <span class="text-brand-amber">⭐</span>
-            <div>
-              <p class="text-xs font-semibold text-brand-dark">Kuota Terbatas</p>
-              <p class="text-[11px] text-gray-500">Sisa 15 Kursi</p>
-            </div>
-          </div>
+
         </div>
       </div>
     </section>

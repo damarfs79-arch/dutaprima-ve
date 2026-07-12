@@ -7,7 +7,7 @@ const year = new Date().getFullYear()
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
       <div>
         <h3 class="font-display font-bold text-lg text-white mb-3 drop-shadow-sm">
-          Duta Prima SMK PGRI 05
+          Duta SMK PGRI 05 JEMBER
         </h3>
         <p class="text-sm text-[#E5C9A8] leading-relaxed">
           Wadah apresiasi dan pengembangan diri bagi siswa-siswi terbaik
@@ -45,7 +45,7 @@ const year = new Date().getFullYear()
         <ul class="space-y-2 text-sm text-white/80">
           <li><a href="#" class="text-[#FAC775] hover:text-white transition-colors">Visi &amp; Misi</a></li>
           <li><a href="#" class="text-[#FAC775] hover:text-white transition-colors">Kontak Kami</a></li>
-          <li><a href="#" class="text-[#FAC775] hover:text-white transition-colors">Lokasi Sekolah</a></li>
+          <li><a href="https://maps.app.goo.gl/RPUZHNQzFFaTeP128" target="_blank" rel="noopener noreferrer" class="text-[#FAC775] hover:text-white transition-colors">Lokasi Sekolah</a></li>
           <li><a href="#" class="text-[#FAC775] hover:text-white transition-colors">Kebijakan Privasi</a></li>
         </ul>
       </div>
@@ -55,9 +55,11 @@ const year = new Date().getFullYear()
           Hubungi Kami
         </h4>
         <ul class="space-y-3 text-sm text-white/80">
-          <li class="flex gap-2">
-            <span>📍</span>
-            <span>Jl. Krakatau No.60, Pd. Waluh, Kencong, Kec. Kencong, Kabupaten Jember, Jawa Timur 68167</span>
+          <li class="flex gap-2 items-start">
+            <span class="mt-0.5">📍</span>
+            <a href="https://maps.app.goo.gl/RPUZHNQzFFaTeP128" target="_blank" rel="noopener noreferrer" class="hover:text-[#FAC775] transition-colors">
+              Jl. Krakatau No.60, Pd. Waluh, Kencong, Kec. Kencong, Kabupaten Jember, Jawa Timur 68167
+            </a>
           </li>
           <li class="flex gap-2">
             <span>✉️</span>
@@ -68,7 +70,7 @@ const year = new Date().getFullYear()
     </div>
 
     <div class="border-t border-white/20 py-5 text-center text-xs text-white/60">
-      &copy; {{ year }} Duta Prima SMK PGRI 05 Jember. All Rights Reserved.
+      &copy; {{ year }} Duta SMK PGRI 05 Jember. All Rights Reserved.
     </div>
   </footer>
 </template>

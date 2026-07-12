@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.3.0",
+    "apexcharts": "^5.16.0",
     "html2pdf.js": "^0.14.0",
     "pinia": "^3.0.4",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue3-apexcharts": "^1.11.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.4",
