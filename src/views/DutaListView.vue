@@ -7,6 +7,7 @@ const route = useRoute()
 const router = useRouter()
 
 const dutas = ref([])
+const isLoading = ref(true)
 const spotlightId = ref(null)
 const isClicked = ref(false) // false = tampil foto berpasangan, true = tampil foto sendiri-sendiri
 const selectedAngkatan = ref(route.query.angkatan || null)
@@ -38,6 +39,7 @@ watch(selectedAngkatan, (newVal) => {
 })
 
 const loadDuta = async () => {
+  isLoading.value = true
   try {
     const [dutaData, angkatanData] = await Promise.all([
       dutaApi.getAll(),
@@ -47,6 +49,8 @@ const loadDuta = async () => {
     angkatanList.value = angkatanData.sort((a, b) => b - a)
   } catch (e) {
     console.error(e)
+  } finally {
+    isLoading.value = false
   }
 }
 onMounted(loadDuta)
@@ -111,8 +115,14 @@ function getThumbPhoto(duta) {
   <div class="bg-white min-h-screen">
 
     <!-- Loading -->
-    <div v-if="!dutas.length" class="flex items-center justify-center py-32">
-      <p class="text-gray-400 text-sm animate-pulse">Memuat data duta...</p>
+    <div v-if="isLoading" class="flex flex-col items-center justify-center py-32 space-y-4">
+      <svg class="w-10 h-10 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+      <p class="text-gray-500 text-sm animate-pulse font-medium">Memuat data duta...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!dutas.length" class="flex flex-col items-center justify-center py-32">
+      <p class="text-gray-400 text-sm italic">Belum ada data duta yang tersedia.</p>
     </div>
 
 

@@ -139,7 +139,7 @@ onUnmounted(() => {
         Voting
       </span>
       <h1 class="font-display font-extrabold text-brand-dark text-3xl sm:text-4xl lg:text-5xl leading-tight">
-        Voting Duta <span class="text-brand-orange">Favorit 2026</span>
+        Voting Calon Duta
       </h1>
       <p class="text-gray-600 mt-5 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
         Suara Anda menentukan siapa yang akan menjadi representasi keunggulan dan inspirasi bagi generasi mendatang. Berikan dukungan Anda kepada kandidat terbaik sekarang.
@@ -179,7 +179,10 @@ onUnmounted(() => {
 
     <!-- Grid Kandidat -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-      <p v-if="loading" class="text-center text-sm text-gray-400 py-10">Memuat kandidat...</p>
+      <div v-if="loading" class="flex flex-col items-center justify-center py-20 space-y-4">
+        <svg class="w-10 h-10 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        <p class="text-sm text-gray-400 animate-pulse font-medium">Memuat kandidat...</p>
+      </div>
       <p v-else-if="errorMsg" class="text-center text-sm text-red-500 py-10">{{ errorMsg }}</p>
       <p v-else-if="kandidatUrut.length === 0" class="text-center text-sm text-gray-400 py-10">
         Belum ada kandidat voting.

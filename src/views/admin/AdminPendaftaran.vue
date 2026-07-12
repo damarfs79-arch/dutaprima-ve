@@ -8,6 +8,7 @@ const loading   = ref(true)
 const selected  = ref(null)
 const showModal = ref(false)
 const deleting  = ref(false)
+const openingDetailId = ref(null)
 
 const loadList = async () => {
   loading.value = true
@@ -21,6 +22,8 @@ const loadList = async () => {
 }
 
 const openDetail = async (item) => {
+  if (openingDetailId.value) return
+  openingDetailId.value = item.id
   try {
     selected.value = await pendaftaranApi.getById(item.id)
     // tandai baca di lokal juga
@@ -29,6 +32,8 @@ const openDetail = async (item) => {
     showModal.value = true
   } catch {
     // ignore
+  } finally {
+    openingDetailId.value = null
   }
 }
 
@@ -142,10 +147,15 @@ onMounted(async () => {
                 <span class="text-[10px] text-gray-400">{{ formatDate(item.created_at) }}</span>
               </div>
             </div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
-              <span class="text-[10px] text-gray-400">Ketuk untuk lihat detail</span>
+            <div class="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-50">
+              <button @click.stop="openDetail(item)"
+                :disabled="openingDetailId === item.id"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-3 rounded-lg transition-colors text-center disabled:opacity-75 disabled:cursor-wait">
+                <span v-if="openingDetailId === item.id">Memuat...</span>
+                <span v-else>Lihat Detail</span>
+              </button>
               <button @click.stop="hapus(item.id)"
-                class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-red-50 transition-colors">
+                class="w-full bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold py-3 rounded-lg transition-colors text-center">
                 Hapus
               </button>
             </div>

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { settingsApi, pendaftaranApi } from '../services/dutaPrimaApi'
 
 const steps = ref([])
+const isPageLoading = ref(true)
 
 const requirements = [
   'Siswa/Siswi aktif kelas X & Xl SMK PGRI 5 JEMBER',
@@ -16,6 +17,7 @@ const requirements = [
 const registrationSettings = ref(null)
 
 const loadSettings = async () => {
+  isPageLoading.value = true
   try {
     const dataFlow = await settingsApi.getSelectionFlow()
     if (dataFlow && dataFlow.steps) {
@@ -27,6 +29,8 @@ const loadSettings = async () => {
     }
   } catch (error) {
     console.error('Gagal memuat pengaturan:', error)
+  } finally {
+    isPageLoading.value = false
   }
 }
 
@@ -182,17 +186,23 @@ onMounted(() => {
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <span class="inline-block bg-brand-amber text-brand-dark text-xs font-semibold px-3 py-1 rounded-full mb-5">
-      Pendaftaran Duta 2026
-    </span>
-    <h1 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-brand-dark max-w-2xl leading-tight">
-      Wujudkan Potensimu Menjadi Representasi Terbaik Sekolah
-    </h1>
-    <p class="text-gray-600 mt-4 max-w-2xl text-sm sm:text-base leading-relaxed">
-      Pilih jalanmu untuk menginspirasi rekan sebaya dan mengharumkan nama SMK PGRI 05 Jember melalui program Duta Prima.
-    </p>
+      <div v-if="isPageLoading" class="flex flex-col items-center justify-center py-20 space-y-4">
+        <svg class="w-10 h-10 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        <p class="text-sm text-gray-400 animate-pulse font-medium">Memuat formulir...</p>
+      </div>
 
-    <div class="grid lg:grid-cols-2 gap-10 mt-12">
+      <template v-else>
+        <span class="inline-block bg-brand-amber text-brand-dark text-xs font-semibold px-3 py-1 rounded-full mb-5">
+          Pendaftaran Duta 2026
+        </span>
+        <h1 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-brand-dark max-w-2xl leading-tight">
+          Wujudkan Potensimu Menjadi Representasi Terbaik Sekolah
+        </h1>
+        <p class="text-gray-600 mt-4 max-w-2xl text-sm sm:text-base leading-relaxed">
+          Pilih jalanmu untuk menginspirasi rekan sebaya dan mengharumkan nama SMK PGRI 05 Jember melalui program Duta Prima.
+        </p>
+
+        <div class="grid lg:grid-cols-2 gap-10 mt-12">
       <!-- Alur Seleksi -->
       <div>
         <h2 class="font-display font-bold text-xl text-brand-brown mb-6">Alur Seleksi</h2>
@@ -430,8 +440,9 @@ onMounted(() => {
           Butuh bantuan? <a href="https://wa.me/6281232282940" target="_blank" rel="noopener noreferrer" class="text-brand-orange font-semibold">Hubungi Panitia</a>
         </p>
       </div>
+      </div>
+      </template>
     </div>
-  </div>
   </div>
 </template>
 

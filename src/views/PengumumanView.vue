@@ -123,7 +123,12 @@ onMounted(() => {
               </thead>
               <tbody>
                 <tr v-if="loading">
-                  <td colspan="4" class="py-8 text-center text-sm text-gray-400">Memuat data...</td>
+                  <td colspan="4" class="py-12">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                      <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                      <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+                    </div>
+                  </td>
                 </tr>
                 <tr v-else-if="daftarAktif.length === 0">
                   <td colspan="4" class="py-8 text-center text-sm text-gray-400">Belum ada data.</td>
