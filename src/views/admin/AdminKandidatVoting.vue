@@ -274,7 +274,10 @@ onMounted(fetchData)
     </div>
 
     <!-- Grid Kandidat -->
-    <p v-if="loading" class="text-center text-sm text-gray-400 py-10">Memuat data...</p>
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20 space-y-4">
+      <svg class="w-10 h-10 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+      <p class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</p>
+    </div>
     <p v-else-if="daftar.length === 0" class="text-center text-sm text-gray-400 py-10">Belum ada kandidat.</p>
     <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       <div

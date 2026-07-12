@@ -32,11 +32,14 @@ const emptyForm = () => ({
 })
 const form = ref(emptyForm())
 
+const loading = ref(true)
+
 // preview URLs
 const preview = ref({ male: null, couple: null, female: null })
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 const loadDuta = async () => {
+  loading.value = true
   try {
     const [dutaData, angkatanData] = await Promise.all([
       dutaApi.getAll(),
@@ -46,6 +49,8 @@ const loadDuta = async () => {
     angkatanList.value = angkatanData.sort((a, b) => b - a)
   } catch (e) {
     console.error(e)
+  } finally {
+    loading.value = false
   }
 }
 onMounted(loadDuta)
@@ -294,7 +299,15 @@ const confirmDelete = async () => {
                 </div>
               </td>
             </tr>
-            <tr v-if="filteredDuta.length === 0">
+            <tr v-if="loading">
+              <td colspan="6" class="px-6 py-12">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                  <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+                </div>
+              </td>
+            </tr>
+            <tr v-else-if="filteredDuta.length === 0">
               <td colspan="6" class="py-12 text-center text-gray-400 text-sm">Tidak ada data duta.</td>
             </tr>
           </tbody>
@@ -304,6 +317,13 @@ const confirmDelete = async () => {
 
     <!-- Mobile Card View (Mobile only) -->
     <div class="grid grid-cols-1 gap-4 md:hidden">
+      <div v-if="loading" class="p-8 flex flex-col items-center justify-center space-y-3">
+        <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+      </div>
+      <div v-else-if="filteredDuta.length === 0" class="p-8 text-center text-gray-400 text-sm">
+        Tidak ada data duta.
+      </div>
       <div v-for="duta in filteredDuta" :key="duta.id" class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
         <div class="flex items-center gap-4">
           <!-- Foto stack -->

@@ -125,7 +125,10 @@ onMounted(fetchData)
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <!-- Mobile Cards -->
       <div class="block md:hidden divide-y divide-gray-100">
-        <div v-if="loading" class="p-8 text-center text-gray-400">Memuat data...</div>
+        <div v-if="loading" class="p-8 flex flex-col items-center justify-center space-y-3">
+          <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+          <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+        </div>
         <div v-else-if="filtered.length === 0" class="p-8 text-center text-gray-400">Belum ada data.</div>
         <div
           v-for="p in filtered"
@@ -170,7 +173,12 @@ onMounted(fetchData)
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="4" class="px-6 py-8 text-center text-gray-400">Memuat data...</td>
+              <td colspan="6" class="px-6 py-12">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                  <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+                </div>
+              </td>
             </tr>
             <tr v-else-if="filtered.length === 0">
               <td colspan="4" class="px-6 py-8 text-center text-gray-400">Belum ada data.</td>

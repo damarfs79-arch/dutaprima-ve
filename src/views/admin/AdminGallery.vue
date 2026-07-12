@@ -15,11 +15,16 @@ const editId = ref(null)
 const toast = ref({ message: '', type: 'success', visible: false })
 const newPhoto = ref({ title: '', category: 'Kegiatan', image: null })
 
+const loading = ref(true)
+
 const loadGalleries = async () => {
+  loading.value = true
   try {
     galleries.value = await galleryApi.getAll()
   } catch (error) {
     console.error(error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -147,6 +152,19 @@ onMounted(loadGalleries)
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
+            <tr v-if="loading">
+              <td colspan="3" class="px-6 py-12">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                  <svg class="w-8 h-8 animate-spin text-brand-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
+                </div>
+              </td>
+            </tr>
+            <tr v-else-if="galleries.filter(g => filter === 'Semua' || g.category === filter).length === 0">
+              <td colspan="3" class="py-12 text-center text-gray-500">
+                Tidak ada data galeri yang ditemukan.
+              </td>
+            </tr>
             <tr v-for="item in galleries.filter(g => filter === 'Semua' || g.category === filter)" :key="item.id" class="hover:bg-gray-50 transition-colors">
               <td class="py-4 px-6">
                 <div class="flex items-center gap-4">
@@ -168,11 +186,6 @@ onMounted(loadGalleries)
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </div>
-              </td>
-            </tr>
-            <tr v-if="galleries.filter(g => filter === 'Semua' || g.category === filter).length === 0">
-              <td colspan="3" class="py-12 text-center text-gray-500">
-                Tidak ada data galeri yang ditemukan.
               </td>
             </tr>
           </tbody>
