@@ -74,7 +74,11 @@ export const galleryApi = {
     abortAndRequest('gallery-page', `/gallery?paginate=1&page=${page}&per_page=${perPage}`),
 
   create: (data) => request('/gallery', { method: 'POST', body: toFormData(data) }),
-  update: (id, data) => request(`/gallery/${id}`, { method: 'POST', body: toFormData(data) }),
+  update: (id, data) => {
+    const fd = toFormData(data)
+    fd.append('_method', 'PUT')
+    return request(`/gallery/${id}`, { method: 'POST', body: fd })
+  },
   remove: (id) => request(`/gallery/${id}`, { method: 'DELETE' }),
 }
 
@@ -88,7 +92,11 @@ export const dutaApi = {
     abortAndRequest('duta-page', `/duta?paginate=1&page=${page}&per_page=${perPage}`),
 
   create: (data) => request('/duta', { method: 'POST', body: toFormData(data) }),
-  update: (id, data) => request(`/duta/${id}`, { method: 'POST', body: toFormData(data) }),
+  update: (id, data) => {
+    const fd = toFormData(data)
+    fd.append('_method', 'PUT')
+    return request(`/duta/${id}`, { method: 'POST', body: fd })
+  },
   remove: (id) => request(`/duta/${id}`, { method: 'DELETE' }),
 }
 
@@ -113,7 +121,11 @@ export const pesertaSeleksiApi = {
 export const kandidatVotingApi = {
   getAll: () => request('/kandidat-voting'),
   create: (data) => request('/kandidat-voting', { method: 'POST', body: toFormData(data) }),
-  update: (id, data) => request(`/kandidat-voting/${id}`, { method: 'POST', body: toFormData(data) }),
+  update: (id, data) => {
+    const fd = toFormData(data)
+    fd.append('_method', 'PUT')
+    return request(`/kandidat-voting/${id}`, { method: 'POST', body: fd })
+  },
   remove: (id) => request(`/kandidat-voting/${id}`, { method: 'DELETE' }),
   vote: (id) => request(`/kandidat-voting/${id}/vote`, { method: 'POST' }),
   resetVotes: () => request('/kandidat-voting/reset', { method: 'POST' }),
