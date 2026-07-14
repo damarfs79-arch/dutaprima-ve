@@ -38,8 +38,8 @@ onMounted(async () => {
       dutaApi.getAll(),
       settingsApi.getAngkatan()
     ])
-    dutas.value = dutaData
-    angkatanList.value = angkatanData.sort((a, b) => b - a)
+    dutas.value = dutaData || []
+    angkatanList.value = (angkatanData || []).sort((a, b) => b - a)
   } catch (e) {}
   document.addEventListener('click', handleClickOutside)
 })
@@ -108,6 +108,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               v-show="showDutaMenu"
               class="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 max-h-60 overflow-y-auto"
             >
+              <RouterLink
+                v-if="!angkatanList || angkatanList.length === 0"
+                to="/daftar-duta"
+                @click="showDutaMenu = false"
+                class="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-amber/10 hover:text-brand-orange transition-colors"
+              >
+                  Semua Duta
+              </RouterLink>
               <RouterLink
                 v-for="angkatan in angkatanList"
                 :key="angkatan"
@@ -211,6 +219,9 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         </RouterLink>
         <div class="border-t border-gray-100 pt-2">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1 px-1">Daftar Duta</p>
+          <RouterLink v-if="!angkatanList || angkatanList.length === 0" to="/daftar-duta" class="block py-2 text-sm font-medium" :class="route.path === '/daftar-duta' ? 'text-brand-orange' : 'text-gray-700'" @click="open = false">
+            Semua Duta
+          </RouterLink>
           <RouterLink v-for="a in angkatanList" :key="a" :to="'/daftar-duta?angkatan=' + a" class="block py-2 text-sm font-medium" :class="route.query.angkatan == a || (route.path === '/daftar-duta' && !route.query.angkatan && a === angkatanList[0]) ? 'text-brand-orange' : 'text-gray-700'" @click="open = false">
             Angkatan {{ a }}
           </RouterLink>

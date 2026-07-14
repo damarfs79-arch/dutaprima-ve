@@ -45,8 +45,8 @@ const loadDuta = async () => {
       dutaApi.getAll(),
       settingsApi.getAngkatan()
     ])
-    dutaList.value = dutaData
-    angkatanList.value = angkatanData.sort((a, b) => b - a)
+    dutaList.value = dutaData || []
+    angkatanList.value = (angkatanData || []).sort((a, b) => b - a)
   } catch (e) {
     console.error(e)
   } finally {
@@ -56,15 +56,16 @@ const loadDuta = async () => {
 onMounted(loadDuta)
 
 // ─── Filter ───────────────────────────────────────────────────────────────────
-const filteredDuta = computed(() =>
-  dutaList.value.filter(d => {
+const filteredDuta = computed(() => {
+  const data = Array.isArray(dutaList.value) ? dutaList.value : []
+  return data.filter(d => {
     const mc = filter.value === 'Semua' || (d.kelas && d.kelas.toLowerCase().includes(filter.value.toLowerCase()))
     const ma = filterAngkatan.value === 'Semua' || d.angkatan == filterAngkatan.value
     const ms = d.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                (d.name_female && d.name_female.toLowerCase().includes(searchQuery.value.toLowerCase()))
     return mc && ma && ms
   })
-)
+})
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 const showToast = (message, type = 'success') => {
@@ -99,7 +100,8 @@ const addAngkatan = () => {
 }
 
 const removeAngkatan = (num) => {
-  const newList = angkatanList.value.filter(a => a !== num)
+  const list = Array.isArray(angkatanList.value) ? angkatanList.value : []
+  const newList = list.filter(a => a !== num)
   saveAngkatanSettings(newList)
 }
 
@@ -193,7 +195,8 @@ const confirmDelete = async () => {
   if (!deleteTargetId.value) return
   try {
     await dutaApi.remove(deleteTargetId.value)
-    dutaList.value = dutaList.value.filter(d => d.id !== deleteTargetId.value)
+    const data = Array.isArray(dutaList.value) ? dutaList.value : []
+    dutaList.value = data.filter(d => d.id !== deleteTargetId.value)
     showToast('Duta berhasil dihapus!', 'success')
   } catch (e) { showToast(e.message, 'error') }
   finally { deleteTargetId.value = null }

@@ -10,20 +10,23 @@ const activeTab = ref('lolos') // 'lolos' | 'tidak_lolos'
 // Modal tambah/edit
 const showModal = ref(false)
 const isEdit = ref(false)
-const form = ref({ id: null, nama: '', kelas: '', status: 'lolos', keterangan: '', wawancara: '', bakat: '' })
+const form = ref({ id: null, nama: '', kelas: '', status: 'lolos', keterangan: '' })
 const saving = ref(false)
 
 // Modal konfirmasi hapus
 const showDeleteConfirm = ref(false)
 const deleteTargetId = ref(null)
 
-const filtered = computed(() => daftar.value.filter((p) => p.status === activeTab.value))
+const filtered = computed(() => {
+  const data = Array.isArray(daftar.value) ? daftar.value : []
+  return data.filter((p) => p.status === activeTab.value)
+})
 
 async function fetchData() {
   loading.value = true
   errorMsg.value = ''
   try {
-    daftar.value = await pesertaSeleksiApi.getAll()
+    daftar.value = (await pesertaSeleksiApi.getAll()) || []
   } catch (err) {
     errorMsg.value = 'Gagal memuat data peserta. Cek koneksi ke API.'
   } finally {
@@ -33,7 +36,7 @@ async function fetchData() {
 
 function openTambah() {
   isEdit.value = false
-  form.value = { id: null, nama: '', kelas: '', status: activeTab.value, keterangan: '', wawancara: '', bakat: '' }
+  form.value = { id: null, nama: '', kelas: '', status: activeTab.value, keterangan: '' }
   showModal.value = true
 }
 
@@ -110,14 +113,14 @@ onMounted(fetchData)
         class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
         :class="activeTab === 'lolos' ? 'bg-brand-amber/15 text-brand-orange' : 'text-gray-500 hover:bg-gray-50'"
       >
-        Lolos ({{ daftar.filter((p) => p.status === 'lolos').length }})
+        Lolos ({{ (Array.isArray(daftar) ? daftar : []).filter((p) => p.status === 'lolos').length }})
       </button>
       <button
         @click="activeTab = 'tidak_lolos'"
         class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
         :class="activeTab === 'tidak_lolos' ? 'bg-brand-amber/15 text-brand-orange' : 'text-gray-500 hover:bg-gray-50'"
       >
-        Tidak Lolos ({{ daftar.filter((p) => p.status === 'tidak_lolos').length }})
+        Tidak Lolos ({{ (Array.isArray(daftar) ? daftar : []).filter((p) => p.status === 'tidak_lolos').length }})
       </button>
     </div>
 
@@ -141,10 +144,7 @@ onMounted(fetchData)
               <p class="text-xs text-gray-500 mt-1">Kelas: {{ p.kelas }}</p>
               <p v-if="p.keterangan" class="text-xs text-gray-400 mt-0.5">{{ p.keterangan }}</p>
               <p v-else class="text-xs text-gray-300 mt-0.5 italic">Tidak ada keterangan</p>
-              <div class="mt-2 text-xs text-gray-500">
-                <p>Wawancara: {{ p.wawancara || '-' }}</p>
-                <p>Bakat: {{ p.bakat || '-' }}</p>
-              </div>
+
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <button @click="openEdit(p)" class="text-brand-orange hover:text-brand-dark text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-brand-amber/30 hover:bg-brand-amber/10 transition-colors">
@@ -165,8 +165,7 @@ onMounted(fetchData)
             <tr class="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
               <th class="px-6 py-4 font-medium">Nama</th>
               <th class="px-6 py-4 font-medium">Kelas</th>
-              <th class="px-6 py-4 font-medium">Wawancara</th>
-              <th class="px-6 py-4 font-medium">Bakat</th>
+
               <th class="px-6 py-4 font-medium">Keterangan</th>
               <th class="px-6 py-4 font-medium text-right">Aksi</th>
             </tr>
@@ -190,8 +189,7 @@ onMounted(fetchData)
             >
               <td class="px-6 py-4 font-semibold text-gray-800">{{ p.nama }}</td>
               <td class="px-6 py-4 text-gray-500">{{ p.kelas }}</td>
-              <td class="px-6 py-4 text-gray-500">{{ p.wawancara || '-' }}</td>
-              <td class="px-6 py-4 text-gray-500">{{ p.bakat || '-' }}</td>
+
               <td class="px-6 py-4 text-gray-500">{{ p.keterangan || '-' }}</td>
               <td class="px-6 py-4 text-right space-x-2">
                 <button @click="openEdit(p)" class="text-brand-orange hover:text-brand-dark text-xs font-semibold">
@@ -247,24 +245,7 @@ onMounted(fetchData)
               <option value="tidak_lolos">Tidak Lolos</option>
             </select>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 mb-1.5">Wawancara</label>
-            <input
-              v-model="form.wawancara"
-              type="text"
-              placeholder="Nilai/Komentar Wawancara"
-              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-500 mb-1.5">Bakat</label>
-            <input
-              v-model="form.bakat"
-              type="text"
-              placeholder="Nilai/Komentar Bakat"
-              class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber"
-            />
-          </div>
+
           <div>
             <label class="block text-xs font-semibold text-gray-500 mb-1.5">Keterangan (opsional)</label>
             <input

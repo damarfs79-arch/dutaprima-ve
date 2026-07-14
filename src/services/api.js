@@ -1,4 +1,4 @@
-const API_PREFIX = '/api'
+const API_PREFIX = import.meta.env.VITE_API_URL || '/api'
 
 async function request(path, { method = 'GET', body, headers = {}, signal, ...options } = {}) {
   const fetchOptions = {
@@ -8,7 +8,7 @@ async function request(path, { method = 'GET', body, headers = {}, signal, ...op
       'Content-Type': 'application/json',
       ...headers,
     },
-    credentials: 'same-origin',
+    credentials: 'include',
     ...(signal ? { signal } : {}),
     ...options,
   }

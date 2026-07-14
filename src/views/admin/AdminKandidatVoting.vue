@@ -30,7 +30,8 @@ const votingSettingForm = ref({ end_time: '' })
 // Data untuk Grafik
 const chartOptions = computed(() => {
   // Sort the data locally for the chart to show highest votes first
-  const sorted = [...daftar.value].sort((a, b) => b.suara - a.suara)
+  const data = Array.isArray(daftar.value) ? daftar.value : []
+  const sorted = [...data].sort((a, b) => b.suara - a.suara)
   return {
     chart: {
       type: 'bar',
@@ -102,7 +103,8 @@ const chartOptions = computed(() => {
 })
 
 const chartSeries = computed(() => {
-  const sorted = [...daftar.value].sort((a, b) => b.suara - a.suara)
+  const data = Array.isArray(daftar.value) ? daftar.value : []
+  const sorted = [...data].sort((a, b) => b.suara - a.suara)
   return [{
     name: 'Total Suara',
     data: sorted.map(k => k.suara)
@@ -117,7 +119,7 @@ async function fetchData() {
       kandidatVotingApi.getAll(),
       settingsApi.getVoting()
     ])
-    daftar.value = daftarRes
+    daftar.value = daftarRes || []
     if (settingRes && settingRes.end_time) {
       // Input datetime-local expects format YYYY-MM-DDThh:mm
       votingSettingForm.value.end_time = settingRes.end_time.substring(0, 16)
@@ -199,7 +201,8 @@ async function doReset() {
     await settingsApi.updateVoting({ end_time: null })
     votingSettingForm.value.end_time = ''
 
-    daftar.value = daftar.value.map((k) => ({ ...k, suara: 0 }))
+    const data = Array.isArray(daftar.value) ? daftar.value : []
+    daftar.value = data.map((k) => ({ ...k, suara: 0 }))
     successMsg.value = 'Semua suara berhasil direset dan sesi voting dibuka kembali.'
     setTimeout(() => (successMsg.value = ''), 4000)
   } catch (err) {

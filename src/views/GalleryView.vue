@@ -16,9 +16,10 @@ const error = ref('')
 const sentinel = ref(null)
 let observer = null
 
-const filtered = computed(() =>
-  active.value === 'Semua' ? items.value : items.value.filter((i) => i.category === active.value)
-)
+const filtered = computed(() => {
+  const data = Array.isArray(items.value) ? items.value : []
+  return active.value === 'Semua' ? data : data.filter((i) => i.category === active.value)
+})
 
 // Fetch halaman berikutnya
 async function loadMore() {
@@ -28,7 +29,7 @@ async function loadMore() {
   try {
     const res = await galleryApi.getPaginated(currentPage.value + 1, 12)
     if (!res) return // request di-abort (navigasi cepat)
-    items.value.push(...(res.data ?? []))
+    items.value.push(...(Array.isArray(res.data) ? res.data : []))
     currentPage.value = res.current_page
     lastPage.value = res.last_page
   } catch (err) {

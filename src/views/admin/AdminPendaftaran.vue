@@ -13,7 +13,7 @@ const openingDetailId = ref(null)
 const loadList = async () => {
   loading.value = true
   try {
-    list.value = await pendaftaranApi.getAll()
+    list.value = (await pendaftaranApi.getAll()) || []
   } catch {
     list.value = []
   } finally {
@@ -47,7 +47,8 @@ const hapus = async (id) => {
   deleting.value = true
   try {
     await pendaftaranApi.remove(id)
-    list.value = list.value.filter(d => d.id !== id)
+    const data = Array.isArray(list.value) ? list.value : []
+    list.value = data.filter(d => d.id !== id)
     closeModal()
   } catch {
     alert('Gagal menghapus data.')
@@ -62,7 +63,8 @@ const formatDate = (str) =>
 
 const unreadCount = ref(0)
 const countUnread = () => {
-  unreadCount.value = list.value.filter(d => !d.is_read).length
+  const data = Array.isArray(list.value) ? list.value : []
+  unreadCount.value = data.filter(d => !d.is_read).length
 }
 
 const unduhPDF = () => {

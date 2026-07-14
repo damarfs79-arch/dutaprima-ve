@@ -20,7 +20,7 @@ const loading = ref(true)
 const loadGalleries = async () => {
   loading.value = true
   try {
-    galleries.value = await galleryApi.getAll()
+    galleries.value = (await galleryApi.getAll()) || []
   } catch (error) {
     console.error(error)
   } finally {
@@ -38,7 +38,8 @@ const confirmDelete = async () => {
 
   try {
     await galleryApi.remove(deleteTargetId.value)
-    galleries.value = galleries.value.filter(g => g.id !== deleteTargetId.value)
+    const data = Array.isArray(galleries.value) ? galleries.value : []
+    galleries.value = data.filter(g => g.id !== deleteTargetId.value)
     showToast('Foto berhasil dihapus!', 'success')
   } catch (error) {
     showToast(error.message, 'error')
@@ -160,12 +161,12 @@ onMounted(loadGalleries)
                 </div>
               </td>
             </tr>
-            <tr v-else-if="galleries.filter(g => filter === 'Semua' || g.category === filter).length === 0">
+            <tr v-else-if="(Array.isArray(galleries) ? galleries : []).filter(g => filter === 'Semua' || g.category === filter).length === 0">
               <td colspan="3" class="py-12 text-center text-gray-500">
                 Tidak ada data galeri yang ditemukan.
               </td>
             </tr>
-            <tr v-for="item in galleries.filter(g => filter === 'Semua' || g.category === filter)" :key="item.id" class="hover:bg-gray-50 transition-colors">
+            <tr v-for="item in (Array.isArray(galleries) ? galleries : []).filter(g => filter === 'Semua' || g.category === filter)" :key="item.id" class="hover:bg-gray-50 transition-colors">
               <td class="py-4 px-6">
                 <div class="flex items-center gap-4">
                   <img :src="item.image" alt="" class="w-16 h-12 rounded-lg object-cover shadow-sm border border-gray-100">

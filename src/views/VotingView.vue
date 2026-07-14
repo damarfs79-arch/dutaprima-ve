@@ -15,9 +15,9 @@ const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 const isVotingEnded = ref(false)
 let timerInterval = null
 
-// Simpan kandidat id yang sudah dipilih
+const parsedStorage = JSON.parse(localStorage.getItem('duta_prima_voted_ids') || '[]')
 const sudahVote = ref(
-  JSON.parse(localStorage.getItem('duta_prima_voted_ids') || '[]').map(id => String(id))
+  (Array.isArray(parsedStorage) ? parsedStorage : []).map(id => String(id))
 )
 
 const hasVotedAny = computed(() => sudahVote.value.length > 0)
@@ -50,7 +50,7 @@ async function fetchKandidat() {
   loading.value = true
   errorMsg.value = ''
   try {
-    kandidat.value = await kandidatVotingApi.getAll()
+    kandidat.value = (await kandidatVotingApi.getAll()) || []
 
     // Auto-reset localStorage if voted candidates were deleted or votes were reset to 0
     if (sudahVote.value.length > 0) {
@@ -85,7 +85,7 @@ async function fetchVotingSettings() {
 
 // Urut otomatis berdasarkan suara terbanyak
 const kandidatUrut = computed(() =>
-  [...kandidat.value].sort((a, b) => b.suara - a.suara)
+  Array.isArray(kandidat.value) ? [...kandidat.value].sort((a, b) => b.suara - a.suara) : []
 )
 
 async function vote(item) {

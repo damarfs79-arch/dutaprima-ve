@@ -6,11 +6,12 @@ const activeTab = ref('lolos')
 
 const daftar = ref([])
 const loading = ref(false)
+const errorMsg = ref('')
 const marqueeText = ref('Menunggu Hasil Seleksi? Tetap Semangat Dan Berikan Yang Terbaik!')
 const marqueeShow = ref(true)
 
 const daftarAktif = computed(() =>
-  daftar.value.filter((p) => p.status === activeTab.value)
+  Array.isArray(daftar.value) ? daftar.value.filter((p) => p.status === activeTab.value) : []
 )
 
 
@@ -18,9 +19,10 @@ const daftarAktif = computed(() =>
 async function fetchData() {
   loading.value = true
   try {
-    daftar.value = await pesertaSeleksiApi.getAll()
+    daftar.value = (await pesertaSeleksiApi.getAll()) || []
   } catch (e) {
     console.error('Gagal memuat data peserta seleksi:', e)
+    errorMsg.value = 'Gagal memuat data pengumuman.'
   } finally {
     loading.value = false
   }
@@ -65,7 +67,7 @@ onMounted(() => {
         Pengumuman
       </span>
       <h1 class="font-display font-extrabold text-brand-dark text-3xl sm:text-4xl lg:text-5xl leading-tight">
-        Pengumuman Hasil Seleksi <span class="text-brand-orange">Duta Prima 2026</span>
+        Pengumuman Hasil Seleksi <span class="text-brand-orange">Duta Prima</span>
       </h1>
       <p class="text-gray-600 mt-5 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
         Selamat kepada para kandidat yang telah menunjukkan dedikasi luar biasa. Hari ini kita merayakan semangat keunggulan SMK PGRI 05 Jember.
@@ -85,7 +87,7 @@ onMounted(() => {
               <span>✓</span>
               Peserta Lolos
               <span class="ml-auto text-xs font-normal opacity-70">
-                {{ daftar.filter(p => p.status === 'lolos').length }}
+                {{ (daftar || []).filter(p => p.status === 'lolos').length }}
               </span>
             </button>
           </div>
@@ -129,6 +131,9 @@ onMounted(() => {
                       <span class="text-sm text-gray-400 animate-pulse font-medium">Memuat data...</span>
                     </div>
                   </td>
+                </tr>
+                <tr v-else-if="errorMsg">
+                  <td colspan="4" class="py-8 text-center text-sm text-red-500">{{ errorMsg }}</td>
                 </tr>
                 <tr v-else-if="daftarAktif.length === 0">
                   <td colspan="4" class="py-8 text-center text-sm text-gray-400">Belum ada data.</td>

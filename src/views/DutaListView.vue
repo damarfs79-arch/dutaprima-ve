@@ -21,10 +21,11 @@ watch(angkatanList, (list) => {
 }, { immediate: true })
 
 const filteredDutas = computed(() => {
+  const data = Array.isArray(dutas.value) ? dutas.value : []
   if (!selectedAngkatan.value) {
-    return angkatanList.value.length ? dutas.value.filter(d => d.angkatan == angkatanList.value[0]) : dutas.value
+    return angkatanList.value.length ? data.filter(d => d.angkatan == angkatanList.value[0]) : data
   }
-  return dutas.value.filter(d => d.angkatan == selectedAngkatan.value)
+  return data.filter(d => d.angkatan == selectedAngkatan.value)
 })
 
 watch(() => route.query.angkatan, (newVal) => {
@@ -45,8 +46,8 @@ const loadDuta = async () => {
       dutaApi.getAll(),
       settingsApi.getAngkatan()
     ])
-    dutas.value = dutaData
-    angkatanList.value = angkatanData.sort((a, b) => b - a)
+    dutas.value = dutaData || []
+    angkatanList.value = (angkatanData || []).sort((a, b) => b - a)
   } catch (e) {
     console.error(e)
   } finally {
