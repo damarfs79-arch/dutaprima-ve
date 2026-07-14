@@ -34,6 +34,34 @@ async function request(path, { method = 'GET', body, headers = {}, signal, ...op
   try {
     const text = await response.text()
     data = text ? JSON.parse(text) : null
+    
+    // Auto-fix URL gambar untuk Hostinger
+    // Karena di Hostinger storage:link tidak bisa dibuat, kita paksa URL ke /storage/app/public/
+    if (data) {
+      const backendUrl = API_PREFIX.replace(/\/api$/, '')
+      const isProd = import.meta.env.PROD
+      
+      const fixUrls = (obj) => {
+        if (typeof obj === 'string' && obj.startsWith('/storage/')) {
+          // Di production hostinger, langsung akses /storage/app/public/
+          // Di lokal, akses normal via symlink /storage/
+          const path = obj.split('/storage/')[1]
+          return isProd 
+            ? `${backendUrl}/storage/app/public/${path}`
+            : `${backendUrl}/storage/${path}`
+        }
+        if (Array.isArray(obj)) {
+          return obj.map(fixUrls)
+        }
+        if (obj !== null && typeof obj === 'object') {
+          for (const key in obj) {
+            obj[key] = fixUrls(obj[key])
+          }
+        }
+        return obj
+      }
+      data = fixUrls(data)
+    }
   } catch (e) {
     if (!response.ok) {
       throw new Error(`Terjadi kesalahan server (Error ${response.status}).`)
