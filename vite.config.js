@@ -18,11 +18,11 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: 'public_html',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
-          // Pisahkan library besar ke chunk terpisah
           'vendor-vue': ['vue', 'vue-router', 'pinia'],
           'vendor-charts': ['apexcharts', 'vue3-apexcharts'],
         },
